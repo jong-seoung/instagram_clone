@@ -1,5 +1,6 @@
 package com.jong.backend.controller;
 
+import com.jong.backend.dto.AuthRequest;
 import com.jong.backend.dto.AuthResponse;
 import com.jong.backend.dto.RegisterRequest;
 import com.jong.backend.service.AuthService;
@@ -22,5 +23,12 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request
     ) {
         return ResponseEntity.ok(authService.register(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> authenticate(
+            @Valid @RequestBody AuthRequest request
+    ) {
+        return ResponseEntity.ok(authService.authenticate(request));
     }
 }
