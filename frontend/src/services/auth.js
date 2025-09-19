@@ -29,7 +29,12 @@ export const authService = {
     localStorage.removeItem("user");
   },
 
+  getCurrentUser() {
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
   isAuthenticated() {
     return !!localStorage.getItem("accessToken");
-  }
+  },
 };
