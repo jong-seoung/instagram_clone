@@ -33,4 +33,19 @@ public class PostController {
         Page<PostResponse> posts = postService.getAllPosts(pageable);
         return ResponseEntity.ok(posts);
     }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResponse> updatePost(
+            @PathVariable Long postId,
+            @Valid @RequestBody PostRequest request
+    ) {
+        PostResponse response = postService.updatePost(postId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
 }
