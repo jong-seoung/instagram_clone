@@ -27,7 +27,6 @@ const usePostStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await postService.getAllPosts(page);
-
       set({
         posts: response.content,
         loading: false,
