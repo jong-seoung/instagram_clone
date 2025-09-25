@@ -2,6 +2,7 @@ package com.jong.backend.controller;
 
 import com.jong.backend.dto.PostRequest;
 import com.jong.backend.dto.PostResponse;
+import com.jong.backend.service.LikeService;
 import com.jong.backend.service.PostService;
 import com.jong.backend.service.S3Service;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class PostController {
     private final PostService postService;
     private final S3Service s3Service;
+    private final LikeService likeService;
 
     private static final int EXPIRATION_MINUTES = 60;
 
@@ -59,5 +61,26 @@ public class PostController {
     public ResponseEntity<Map<String, String>> getPresignedUrl(@RequestParam String url) {
         String imageUrl = s3Service.generatePresignedUrl(url, EXPIRATION_MINUTES);
         return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable Long postId) {
+        boolean isLiked = likeService.toggleLike(postId);
+        Long likeCount = likeService.getLikeCount(postId);
+
+        return ResponseEntity.ok().body(Map.of(
+                "isLiked", isLiked,
+                "likeCount", likeCount
+        ));
+    }
+
+    @GetMapping("/count/{postId}")
+    public ResponseEntity<Long> countLike(@PathVariable Long postId) {
+        return ResponseEntity.ok(likeService.getLikeCount(postId));
+    }
+
+    @GetMapping("/is-liked/{postId}")
+    public ResponseEntity<Boolean> isLikedByMe(@PathVariable Long postId) {
+        return ResponseEntity.ok(likeService.isLikedByCurrentUser(postId));
     }
 }
