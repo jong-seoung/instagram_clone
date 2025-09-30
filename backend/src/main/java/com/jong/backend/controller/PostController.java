@@ -42,6 +42,23 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<PostResponse>> getUserPosts(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PostResponse> posts = postService.getUserPosts(userId, pageable);
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/user/{userId}/count")
+    public ResponseEntity<Map<String, Long>> getUserPostCount(@PathVariable Long userId) {
+        Long count = postService.getUserPostCount(userId);
+        return ResponseEntity.ok(Map.of("count", count));
+    }
+
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable Long postId,
@@ -72,15 +89,5 @@ public class PostController {
                 "isLiked", isLiked,
                 "likeCount", likeCount
         ));
-    }
-
-    @GetMapping("/count/{postId}")
-    public ResponseEntity<Long> countLike(@PathVariable Long postId) {
-        return ResponseEntity.ok(likeService.getLikeCount(postId));
-    }
-
-    @GetMapping("/is-liked/{postId}")
-    public ResponseEntity<Boolean> isLikedByMe(@PathVariable Long postId) {
-        return ResponseEntity.ok(likeService.isLikedByCurrentUser(postId));
     }
 }

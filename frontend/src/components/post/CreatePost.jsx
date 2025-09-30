@@ -98,7 +98,6 @@ const CreatePost = ({ post, onClose }) => {
           }
         );
         imageUrl = response.data.url;
-        console.log(imageUrl);
       }
 
       if (post) {

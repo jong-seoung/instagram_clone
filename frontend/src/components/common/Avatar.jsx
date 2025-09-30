@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { FiUser } from "react-icons/fi";
 
 const SIZES = {
@@ -16,12 +17,46 @@ const Avatar = ({
   showBorder = false,
   borderColor = "black",
 }) => {
+  const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState(false);
 
   const sizeConfig = SIZES[size];
 
   const borderClass = showBorder ? `ring-2 ring-${borderColor}` : "";
-  const showImage = user?.profileImageUrl && !imageError;
+  const showImage = imageUrl && !imageError;
+
+  useEffect(() => {
+    const getImage = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+
+        if (!token || token === "undefined" || token === "null") {
+          throw new Error(
+            "No valid authenication token found. Please login again."
+          );
+        }
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/posts/image?url=${
+            user.profileImageUrl
+          }`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setImageUrl(response.data.imageUrl);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (!user?.profileImageUrl) return;
+
+    getImage();
+  }, [user]);
 
   return (
     <div
@@ -29,7 +64,7 @@ const Avatar = ({
     >
       {showImage && (
         <img
-          src={user.profileImageUrl}
+          src={imageUrl}
           alt={user.username || user.fullName || "User"}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}

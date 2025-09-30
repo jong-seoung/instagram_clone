@@ -1,5 +1,6 @@
 package com.jong.backend.config;
 
+import com.jong.backend.security.JwtAuthenticationEntryPoint;
 import com.jong.backend.security.JwtAuthenticationFilter;
 import com.jong.backend.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Value("${frontend.url}")
@@ -52,6 +54,7 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

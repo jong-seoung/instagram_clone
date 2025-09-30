@@ -13,7 +13,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class S3Controller {
     private final S3Service s3Service;
-    private static final int EXPIRATION_MINUTES = 60;
 
     @PostMapping("/post")
     public ResponseEntity<Map<String, String>> uploadPostImage(@RequestParam("file") MultipartFile file) {
@@ -21,9 +20,9 @@ public class S3Controller {
         return ResponseEntity.ok(Map.of("url", url));
     }
 
-    @GetMapping("/image")
-    public ResponseEntity<Map<String, String>> getPresignedUrl(@RequestParam String url) {
-        String imageUrl = s3Service.generatePresignedUrl(url, EXPIRATION_MINUTES);
-        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    @PostMapping("/profile")
+    public ResponseEntity<Map<String, String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+        String url = s3Service.uploadFile(file, "profile");
+        return ResponseEntity.ok(Map.of("url", url));
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Slf4j
 public class PostService {
+
     private final PostRepository postRepository;
     private final AuthenticationService authenticationService;
     private final LikeRepository likeRepository;
@@ -48,7 +49,6 @@ public class PostService {
             PostResponse response = PostResponse.fromEntity(post);
             Long likeCount = likeRepository.countByPostId(post.getId());
             boolean isLiked = likeRepository.existsByUserAndPost(currentUser, post);
-
             Long commentCount = commentRepository.countByPostId(post.getId());
 
             response.setLikeCount(likeCount);
@@ -57,6 +57,30 @@ public class PostService {
 
             return response;
         });
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostResponse> getUserPosts(Long userId, Pageable pageable) {
+        User currentUser = authenticationService.getCurrentUser();
+        Page<Post> posts = postRepository.findByUserIdAndNotDeleted(userId, pageable);
+        return posts.map(post -> {
+            PostResponse response = PostResponse.fromEntity(post);
+            Long likeCount = likeRepository.countByPostId(post.getId());
+            boolean isLiked = likeRepository.existsByUserAndPost(currentUser, post);
+            Long commentCount = commentRepository.countByPostId(post.getId());
+
+            response.setLikeCount(likeCount);
+            response.setLiked(isLiked);
+            response.setCommentCount(commentCount);
+
+            return response;
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public Long getUserPostCount(Long userId) {
+        authenticationService.getCurrentUser();
+        return postRepository.countByUserIdAndNotDeleted(userId);
     }
 
     public PostResponse updatePost(Long postId, PostRequest request) {

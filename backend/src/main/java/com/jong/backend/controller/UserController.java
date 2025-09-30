@@ -1,13 +1,12 @@
 package com.jong.backend.controller;
 
 import com.jong.backend.dto.UserResponse;
+import com.jong.backend.dto.UserUpdateRequest;
 import com.jong.backend.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,5 +19,11 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
         UserResponse user = userService.getUserByUsername(username);
         return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserResponse> updateProfile(@Valid @RequestBody UserUpdateRequest request) {
+        UserResponse updatedUser = userService.updateProfile(request);
+        return ResponseEntity.ok(updatedUser);
     }
 }

@@ -17,13 +17,17 @@ import CreatePost from "./CreatePost";
 import axios from "axios";
 import useLikeStore from "../../store/likeStore";
 import CommentSection from "../comment/CommentSection";
+import useBookmarkStore from "../../store/bookmarkStore";
 
 const PostCard = ({ post }) => {
   const { user } = useAuthStore();
   const { deletePost } = usePostStore();
   const { toggleLike } = useLikeStore();
+  const { toggleBookmark, getIsBookmarked } = useBookmarkStore();
 
   const menuRef = useRef(null);
+
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const isOwner = post.user.id == user.id;
 
@@ -56,6 +60,12 @@ const PostCard = ({ post }) => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleBookmark = async () => {
+    try {
+      setIsBookmarked(await toggleBookmark(post.id));
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -104,6 +114,19 @@ const PostCard = ({ post }) => {
 
     getImage();
   }, [post]);
+
+  useEffect(() => {
+    const loadIsBookmarked = async () => {
+      try {
+        if (!post) return;
+
+        setIsBookmarked(await getIsBookmarked(post.id));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadIsBookmarked();
+  }, [post, getIsBookmarked]);
 
   return (
     <>
@@ -189,8 +212,20 @@ const PostCard = ({ post }) => {
               </button>
             </div>
 
-            <button className="transition-all duration-200 text-gray-700 hover:text-gray-900">
-              <FiBookmark size={20} className="fill-current" />
+            <button
+              className={`transition-all duration-200 ${
+                isBookmarked
+                  ? "text-gray-900"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
+              onClick={handleBookmark}
+            >
+              <FiBookmark
+                size={20}
+                className={`transition-all duration-200 ${
+                  isBookmarked ? "fill-current" : ""
+                }`}
+              />
             </button>
           </div>
         </div>
